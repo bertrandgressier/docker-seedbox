@@ -83,6 +83,8 @@ services:
     environment:
       - TZ=EST
       - PLEX_CLAIM=${PLEX_CLAIM}
+      - PLEX_UID=${UID}
+      - PLEX_GID=${GID}
     network_mode: host
     volumes:
       - ./config/plex-config:/config
@@ -127,3 +129,25 @@ services:
       - ./config/jackett:/config   
       - ./downloads:/downloads
       - /etc/localtime:/etc/localtime:ro
+
+  radarr:
+    restart: always
+    image: "linuxserver/radarr"
+    container_name: "radarr"
+    volumes:
+      - ./config/radarr:/config
+      - ./media/movies:/movies
+      - ./downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=${TIMEZONE}
+      - PUID=${UID}
+      - PGID=${GID}
+      - VIRTUAL_PORT=7878
+      - VIRTUAL_HOST=radarr.${HOSTNAME}
+      - LETSENCRYPT_HOST=sonarr.${HOSTNAME}
+      - LETSENCRYPT_EMAIL=${EMAIL}
+    depends_on:
+      - rtorrent
+      - transmission
+      - jackett

@@ -17,6 +17,7 @@ Tools embedded
 - ruTorrent : dl.yourdomain.com
 - Jackett (Torrent search) : jackett.yourdomain.com
 - Sonarr : sonarr.yourdomain.com
+- Radarr : radarr.yourdomain.com
 - Plex server
 
 Installation and configuration
@@ -64,10 +65,11 @@ docker run --rm -ti xmartlabs/htpasswd user password > ./config/nginx-proxy-htpa
 If you want to define the same password for all tools, you can used only one file containing password
 ```
 cd ./config/nginx-proxy-htpasswd/
-ln -s dl.mysubdomain.con passwordFile
-ln -s trans.mysubdomain.con passwordFile
-ln -s sonarr.mysubdomain.con passwordFile
-ln -s jackett.mysubdomain.con passwordFile
+ln -s passwordFile dl.mysubdomain.com
+ln -s passwordFile trans.mysubdomain.com 
+ln -s passwordFile sonarr.mysubdomain.com 
+ln -s passwordFile radarr.mysubdomain.com
+ln -s passwordFile jackett.mysubdomain.com 
 ```
 
 ### Configure Plex
@@ -78,7 +80,7 @@ Go on http://yourdomain.com:32400
 Go on https://jackett.yourdomain.com and register all your torrent board as you want.
 This tool exposed a standard for all tools to search contents.
 
-### Configure Sonarr
+### Configure Sonarr & Radarr
 Go on https://sonarr.yourdomain.com
 
  **Set Download client - Transmission**
