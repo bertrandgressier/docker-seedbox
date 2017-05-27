@@ -2,10 +2,10 @@ Welcome to All in one Docker seedbox !
 ===================
 
 
-I decided to experiment docker and docker-compose and I decided to assembly a lot of tools for create a seedbox environment.
-You don't need to install no other package on your system that docker. Amazing no ?
+I decided to experiment docker and docker-compose and to assembly a lot of tools to create a seedbox environment.
+You don't need to install another package on your system that docker. Amazing no ?
 
-*All tools are exposed with https*
+*All tools are exposed with https thanks let's encrypt*
 
 ----------
 
@@ -90,11 +90,13 @@ Go on https://sonarr.yourdomain.com
  * Name : transmission
  * Host: transmission
  * port: 9091 
+ 
  **Set Download client - ruTorrent**
  * Name : rTorrent
  * Host: rtorrent
  * port: 80
  * Path: /plugins/rpc/rpc.php
+ 
  **Set Indexer - torznab custom (example, used your own jackett infornation)**
  * Name: The Pirate Bay
  * Host: http://jackett:9117/torznab/thepiratebay
