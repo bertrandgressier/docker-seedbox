@@ -38,7 +38,10 @@ sudo usermod -aG docker seedbox
  ```
 
 - Now clone this repository in the user home space
--- git clone ...
+
+```
+git clone git@github.com:bertrandgressier/docker-seedbox.git
+```
 
 ### setup environment
 
@@ -47,7 +50,7 @@ Modify the file
 You can bought a subdomain for only 2€/year on OVH and set all the subdomain necessary. This is mandatory because all tools are exposed only on the https port and use validate certificate.
 If you don't want to spend 2€ you can set all your domain in your host file ... Ask to google.
 
-###Start all tools
+### Start all tools
 
 In the root folder execute
 ```
