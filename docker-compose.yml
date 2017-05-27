@@ -1,0 +1,129 @@
+version : '3.2'
+
+volumes:
+  nginx-vhostd: 
+  nginx-html: 
+
+services:
+  nginx-proxy:
+    restart: always
+    image: jwilder/nginx-proxy:alpine
+    container_name: proxy
+    environment:
+      - UID=${UID}
+      - GID=${GID}
+    ports:
+      - "80:80"
+      - "443:443"
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true
+    volumes:
+      - ./config/nginx-proxy-certs:/etc/nginx/certs:ro
+      - ./config/nginx-proxy-htpasswd:/etc/nginx/htpasswd
+      - nginx-vhostd:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  nginx-proxy-companion:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: proxy-companion
+    environment:
+      - UID=${UID}
+      - GID=${GID}
+    volumes:
+      - ./config/nginx-proxy-certs:/etc/nginx/certs:rw
+      - nginx-vhostd:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  transmission:
+    restart: always
+    image: linuxserver/transmission
+    container_name: transmission
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - VIRTUAL_PORT=9091
+      - VIRTUAL_HOST=trans.${HOSTNAME}
+      - LETSENCRYPT_HOST=trans.${HOSTNAME}
+      - LETSENCRYPT_EMAIL=${EMAIL}
+    ports:
+      - "51414:51414"
+      - "51414:51414/udp"
+    volumes:
+      - ./config/transmission-config:/config
+      - ./downloads:/downloads
+      - ./config/transmission-watch:/watch
+
+  rtorrent:
+    restart: always
+    image: linuxserver/rutorrent
+    container_name: rtorrent
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - VIRTUAL_PORT=80
+      - VIRTUAL_HOST=dl.${HOSTNAME}
+      - LETSENCRYPT_HOST=dl.${HOSTNAME}
+      - LETSENCRYPT_EMAIL=${EMAIL}
+    ports:
+      - "51413:51413"
+      - "6881:6881/udp"
+    volumes:
+      - ./config/rutorrent:/config
+      - ./downloads:/downloads
+
+  plex:
+    container_name: plex
+    image: plexinc/pms-docker
+    restart: unless-stopped
+    environment:
+      - TZ=EST
+      - PLEX_CLAIM=${PLEX_CLAIM}
+    network_mode: host
+    volumes:
+      - ./config/plex-config:/config
+      - ./config/plex-transcode:/transcode
+      - ./media:/data
+
+  sonarr:
+    restart: always
+    image: "linuxserver/sonarr"
+    container_name: "sonarr"
+    volumes:
+      - ./config/sonarr:/config
+      - ./media/series:/tv
+      - ./downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=${TIMEZONE}
+      - PUID=${UID}
+      - PGID=${GID}
+      - VIRTUAL_PORT=8989
+      - VIRTUAL_HOST=sonarr.${HOSTNAME}
+      - LETSENCRYPT_HOST=sonarr.${HOSTNAME}
+      - LETSENCRYPT_EMAIL=${EMAIL}
+    depends_on:
+      - rtorrent
+      - transmission
+      - jackett
+
+  jackett:
+    restart: always
+    image: "linuxserver/jackett"
+    container_name: "jackett"
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TIMEZONE}
+      - VIRTUAL_PORT=9117
+      - VIRTUAL_HOST=jackett.${HOSTNAME}
+      - LETSENCRYPT_HOST=jackett.${HOSTNAME}
+      - LETSENCRYPT_EMAIL=${EMAIL}
+    volumes:  
+      - ./config/jackett:/config   
+      - ./downloads:/downloads
+      - /etc/localtime:/etc/localtime:ro
